@@ -1,0 +1,88 @@
+
+.reg_btn a{
+    display: inline-block; 
+    right: 0.5%;
+    z-index: -1;
+    text-align: center;
+    width:120px;
+    padding: 1em 0;
+    text-decoration: none;
+    background-color: darkslategrey;
+    font-weight: bold;
+    color: white; 
+}
+
+#nav_menu ul {
+    list-style-type: none;
+    position:relative;
+    border-bottom: 1em black;
+}
+
+#reg_menu{
+    list-style-type: none;
+    position:relative;
+    float:right;
+}
+
+#nav_menu ul li {
+    display: inline;
+    padding: 0 1em; 
+    float: left;
+}
+
+#nav_menu ul ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+}
+
+#nav_menu ul ul li{
+    float: none;
+}
+
+#nav_menu ul li:hover > ul {
+    display:inline;
+}
+
+#nav_menu > ul::after{
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#nav_menu ul li a {
+    text-align: center;
+    display: block;
+    width:175px;
+    padding: 1em 0;
+    text-decoration: none;
+    background-color: darkslategray;
+    font-weight: bold;
+    color: white; 
+}
+
+#nav_menu ul li a.lastitem { 
+    border-right: none;
+}
+
+#nav_menu ul li a.current { 
+    text-decoration: none; 
+    color:yellow;
+}
+
+body{
+    background-color: #778899;
+}
+
+.heading {
+    text-align: center;
+    color: lightsl
+}
+
+.heading_desc{
+    align-self: auto;
+    margin:auto;
+    text-align: center;
+    word-wrap: break-word;
+    width: 50%;
+}
