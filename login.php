@@ -1,7 +1,9 @@
 <?php
+
+// NOTE: Need to have profile button display after logging in and need to direct them to another page or remove the login fields since they just logged in
     session_start();
     $profile_btn_html = "";
-    if($_SESSION['logged_in']){
+    if(isset($_SESSION['logged_in']) && $_SESSION['logged_in']){
         $profile_btn_html .= "<span class=\"reg_btn\">
             <a href= \"profile.php\" >Profile</a>
             </span>";
@@ -55,7 +57,7 @@
         }
     }
     else if(isset($_POST['login_btn'])){
-        if($_SESSION['logged_in']){
+        if(isset($_SESSION['logged_in']) && $_SESSION['logged_in']){
             $error = true;
             $login_message = $login_message . " You are already logged in.";
         }
@@ -100,7 +102,7 @@
         <nav id="nav_menu">
             <ul>
                 <li><a href="index.php">Home</a></li>
-                <li><a href="#">Browse</a></li>
+                <li><a href="browse.php">Browse</a></li>
                 <li><a href="search.php">Search</a></li>
                 <li><a href="about.php">About</a></li>
             </ul>

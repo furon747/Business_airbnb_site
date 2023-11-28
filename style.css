@@ -86,3 +86,7 @@ body{
     word-wrap: break-word;
     width: 50%;
 }
+form  { 
+    margin: 0px auto; display: table;      }
+label { display: table-cell; }
+input { display: table-cell; }

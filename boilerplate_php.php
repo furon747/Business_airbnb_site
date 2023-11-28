@@ -1,4 +1,5 @@
 <!-- Purpose of this file is to have the top portion of each webpage easily copy-able for future use. Maybe not needed !-->
+<!-- We should try to reference this class to avoid making changes to each navbar and instead just reference static HTML in the future when everything else is done!-->
 
 <?php session_start(); 
     $profile_btn_html = "";
