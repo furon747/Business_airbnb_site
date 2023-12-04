@@ -1,10 +1,14 @@
-<?php session_start(); 
+<?php 
+    session_start(); 
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+
     $profile_btn_html = "";
     $add_new_property_html = "";
     $reg_message = "";
     $error_message = "";
     $result = null;
-    $img_content = [null, null];
+    $img_content = [null, null, null, null, null];
     if(isset($_SESSION['logged_in']) && $_SESSION['logged_in']){
         $profile_btn_html .= "<span class=\"reg_btn\">
             <a href= \"profile.php\" >Profile</a>
@@ -27,7 +31,7 @@
         $frame_1_start = $_POST['frame_1_start'];
         $frame_1_end = $_POST['frame_1_end'];
         $frame_2_start = $_POST['frame_2_start'];
-        $frame_2_end = $_POST['frame_2_start'];
+        $frame_2_end = $_POST['frame_2_end'];
         $frame_3_start = $_POST['frame_3_start'];
         $frame_3_end = $_POST['frame_3_end'];
         $available_seats = intval($_POST['available_seats']);
@@ -47,17 +51,24 @@
             }
 
             $index = 0;
-            $query = sprintf("INSERT INTO SPACES (NAME, REGISTRATION_START_DATE, REGISTRATION_END_DATE, STATUS, STREET_ADDRESS, CITY, STATE, ZIP_CODE, FRAME_1_START, FRAME_1_END,
+
+            // Company ID needs to either be autofilled or remembered. Maybe let's do autofill in the future
+            $query = sprintf("INSERT INTO SPACES (NAME, COMPANY_ID, REGISTRATION_START_DATE, REGISTRATION_END_DATE, STATUS, STREET_ADDRESS, CITY, STATE, ZIP_CODE, FRAME_1_START, FRAME_1_END,
                 FRAME_2_START, FRAME_2_END, FRAME_3_START, FRAME_3_END, SEATS, ROOMS, IMAGE_1, IMAGE_2) 
-                VALUES('%s', STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), %d, '%s', '%s', '%s', '%s', STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), 
-                STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'),STR_TO_DATE('%s','%%Y-%%m-%%d'), %d, %d, '%s', '%s' )", 
-                $name, $reg_start, $reg_end, $status, $address, $city, $state, $zip, $frame_1_start, $frame_1_end, $frame_2_start, $frame_2_end, $frame_3_start, $frame_3_end,
+                VALUES('%s', %d, STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), %d, '%s', '%s', '%s', '%s', STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'), 
+                STR_TO_DATE('%s','%%Y-%%m-%%d'), STR_TO_DATE('%s','%%Y-%%m-%%d'),STR_TO_DATE('%s','%%Y-%%m-%%d'), %d, %d, '%s', '%s')", 
+                $name, $company, $reg_start, $reg_end, $status, $address, $city, $state, $zip, $frame_1_start, $frame_1_end, $frame_2_start, $frame_2_end, $frame_3_start, $frame_3_end,
                 $available_seats, $total_rooms, $img_content[$index++], $img_content[$index++]);
 
-            // NOTE: In the past this has inserted each time we refresh, but using $_SERVER['REQUEST_METHOD'] above seems to have fixed that
             mysqli_query($connection, $query);
 
-                $reg_message = "New location added!";
+            $query = sprintf("UPDATE spaces SET Image_3 = '%s', Image_4 = '%s' WHERE NAME = '%s' AND company_id = %d", $img_content[$index++], $img_content[$index++], $name, $company);
+            mysqli_query($connection, $query);
+
+            $query = sprintf("UPDATE spaces SET Image_5 = '%s' WHERE NAME = '%s' AND COMPANY_ID = %d", $img_content[$index++], $name, $company);
+            mysqli_query($connection, $query);
+            $reg_message .= " New location added!";
+            
 
             // this is to stop query on refresh, might need later
             //header("Location: profile.php");
@@ -70,7 +81,7 @@
     function valid_fields($name, $reg_start, $reg_end, $company, $address, $city, $zip, $frame_1_start, $frame_1_end, $frame_2_start, $frame_2_end, $frame_3_start, $frame_3_end){
             
         global $error_message;
-        $passing = false;
+        $passing = true;
         $now = new DateTime();
 
         if(strlen($name) == 0 || strlen($name) >= 31){
@@ -107,12 +118,11 @@
             $passing = false;
         }
 
-        // Frame start must be after the registration end and the frame start must be before the frame end
+        // TODO: Need to account for if the days are the same
         if(date_diff(new DateTime($frame_1_start), new DateTime($frame_1_end))->format("%r%a") <= 0 || 
         date_diff(new DateTime($reg_end), new DateTime($frame_1_start))->format("%r%a") <= 0){
             $passing = false;
             $error_message .= "Invalid range of time for timeframe 1. ";
-            $error_message .= date_diff(new DateTime($frame_1_start), new DateTime($reg_end))->format("%r%a");
         }
 
         if(date_diff(new DateTime($frame_2_start), new DateTime($frame_2_end))->format("%r%a") <= 0 || 
@@ -159,7 +169,6 @@
             <ul>
                 <li><a href="index.php">Home</a></li>
                 <li><a href="browse.php">Browse</a></li>
-                <li><a href="search.php">Search</a></li>
                 <li><a href="about.php">About</a></li>
             </ul>
         </nav>
@@ -169,7 +178,7 @@
                 <h2>Add New Office Space</h2>
                 <form action="profile.php" method="post" enctype="multipart/form-data">
                 <div id="reg_new_space">
-                    <label>Space Name</label>
+                    <label >Space Name</label>
                     <input type="text" name="space_name" value = "<?php echo isset($_POST['space_name']) ? $_POST['space_name'] :"" ?>"><br><br>
 
                     <label>Company</label>
@@ -312,6 +321,15 @@
                     
                     <label>Image 2</label>
                     <input type="file" name="img_2" value = "<?php echo isset($_POST['img_2']) ? $_POST['img_2'] :"" ?>"><br><br>
+
+                    <label>Image 3</label>
+                    <input type="file" name="img_3" value = "<?php echo isset($_POST['img_3']) ? $_POST['img_3'] :"" ?>"><br><br>
+
+                    <label>Image 4</label>
+                    <input type="file" name="img_4" value = "<?php echo isset($_POST['img_4']) ? $_POST['img_4'] :"" ?>"><br><br>
+
+                    <label>Image 5</label>
+                    <input type="file" name="img_5" value = "<?php echo isset($_POST['img_5']) ? $_POST['img_5'] :"" ?>"><br><br>
                 </div>
                 <div id="buttons">
                     <label>&nbsp;</label>
