@@ -17,7 +17,7 @@ I learned a tremendous amount from this project, including:
 - Basic AJAX
 - MySQL syntax
 
-I genuinely loved this project, and hope to return to it someday and transform it into a possibly viable product idea.
+ I genuinely loved this project, and hope to return to it someday and transform it into a possibly viable product idea.
 ---
 
 ## 📌 How to Run  
